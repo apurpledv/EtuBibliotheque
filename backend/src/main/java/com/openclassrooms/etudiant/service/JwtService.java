@@ -1,19 +1,24 @@
 package com.openclassrooms.etudiant.service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-    private final Key jwtKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Autowired
+    JwtDecoder jwtDecoder;
+
+    SecretKey jwtKey = new SecretKeySpec("qhb9ikUFGKPyUUMKBrrV7ByQjBWFy8xLPkKr36XSiTH".getBytes(), "HmacSHA256");
 
     public String generateToken(UserDetails userDetails) {
+        System.out.println(jwtKey);
         return Jwts.builder()
             .setSubject(userDetails.getUsername())
             .signWith(jwtKey)

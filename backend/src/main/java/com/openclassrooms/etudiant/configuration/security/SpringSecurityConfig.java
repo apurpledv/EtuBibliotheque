@@ -1,11 +1,16 @@
 package com.openclassrooms.etudiant.configuration.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,6 +18,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -24,8 +31,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(customUserDetailService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -41,6 +47,13 @@ public class SpringSecurityConfig {
     }
 
     @Bean
+    public JwtDecoder jwtDecoder() {
+        SecretKey jwtKey = new SecretKeySpec("qhb9ikUFGKPyUUMKBrrV7ByQjBWFy8xLPkKr36XSiTH".getBytes(), "HmacSHA256");
+
+        return NimbusJwtDecoder.withSecretKey(jwtKey).build();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(AbstractHttpConfigurer::disable)
@@ -53,6 +66,9 @@ public class SpringSecurityConfig {
                         .requestMatchers("/api/register", "/api/login").permitAll()
                         // Others protected routes will be added here.
                         .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 ->
+                    oauth2.jwt(Customizer.withDefaults())
                 )
                 // .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
