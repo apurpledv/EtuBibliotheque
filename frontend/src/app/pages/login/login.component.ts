@@ -6,6 +6,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Login } from '../../core/models/Login';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../shared/material.module';
+import { AuthToken } from '../../core/models/AuthToken';
+import { Router } from '@angular/router';
+//import { AuthInterceptorService } from '../../core/service/auth-interceptor.service';
 
 @Component({
   selector: 'app-login',
@@ -15,9 +18,12 @@ import { MaterialModule } from '../../shared/material.module';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+  constructor(private router: Router) { }
+  
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  //private authService = inject(AuthInterceptorService)
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
 
@@ -36,21 +42,24 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     this.submitted = true;
+
     if (this.loginForm.invalid) {
       return;
     }
+
     const loginUser: Login = {
       login: this.loginForm.get('login')?.value,
       password: this.loginForm.get('password')?.value
     };
+    
     this.userService.login(loginUser)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(
-      () => {
-        alert('You are logged in!');
-        // TODO : router l'utilisateur vers la page de login
-      },
-    );
+      .subscribe(res => {
+        alert("You are logged on!");
+        sessionStorage.setItem('auth_token', res.token);
+        console.log("Token stored as 'auth_token': " + sessionStorage.getItem("auth_token"));
+        this.router.navigateByUrl('student-list');
+      });
   }
 
   onReset(): void {

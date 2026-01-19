@@ -3,6 +3,7 @@ import { Register } from '../models/Register';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Login } from '../models/Login';
+import { AuthToken } from '../models/AuthToken';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class UserService {
     return this.httpClient.post('/api/register', user);
   }
 
-  login(user: Login): Observable<Object> {
-    return this.httpClient.post('/api/login', user);
+  login(user: Login): Observable<AuthToken> {
+    return this.httpClient.post<AuthToken>('/api/login', user);
   }
 }

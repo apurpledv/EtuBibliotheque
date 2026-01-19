@@ -5,6 +5,8 @@ import com.openclassrooms.etudiant.dto.RegisterDTO;
 import com.openclassrooms.etudiant.dto.TokenDTO;
 import com.openclassrooms.etudiant.mapper.UserDtoMapper;
 import com.openclassrooms.etudiant.service.UserService;
+
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +34,11 @@ public class UserController {
     }
 
     @PostMapping("/api/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         try {
-            String jwtToken = userService.login(loginRequestDTO.getLogin(), loginRequestDTO.getPassword());
-            return ResponseEntity.ok(new TokenDTO(jwtToken));
+            String jwt = userService.login(loginRequestDTO.getLogin(), loginRequestDTO.getPassword());
+
+            return ResponseEntity.ok(new TokenDTO(jwt));
         } catch (IllegalArgumentException e) {
             log.error(e.toString());
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

@@ -1,0 +1,30 @@
+
+<div class="card m-3">
+    <h5 class="card-header"><a routerLink="../student-add">Add a Student</a></h5>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (student of students; track student.id) {
+                    <tr>
+                        <td>{{student.firstName}}</td>
+                        <td>{{student.lastName}}</td>
+                        @if (student.id !== undefined) {
+                            <td>
+                                <div class="studentEditGroup">
+                                    <a class="btn btn-primary btn-sm" [routerLink]="['../student-edit', student.id]">Edit</a>
+                                    <button class="btn btn-primary btn-sm" (click)="onDeleteStudent(student.id)">Delete</button>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

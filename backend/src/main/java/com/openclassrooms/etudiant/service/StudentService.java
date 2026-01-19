@@ -36,6 +36,7 @@ public class StudentService {
     }
 
     public boolean addStudent(Student student) {
+        student.setId(null);
         Student newStudent = studentRepository.save(student);
 
         if (newStudent != null) {
