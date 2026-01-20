@@ -21,7 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public void register(User user) {
+    public boolean register(User user) {
         Assert.notNull(user, "User must not be null");
         log.info("Registering new user");
 
@@ -31,6 +31,7 @@ public class UserService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        return true;
     }
 
     public String login(String login, String password) {

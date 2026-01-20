@@ -2,6 +2,7 @@ package com.openclassrooms.etudiant.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,36 +36,40 @@ public class StudentService {
         return studentList;
     }
 
-    public boolean addStudent(Student student) {
+    public boolean addStudent(Student student) throws Exception {
         student.setId(null);
         Student newStudent = studentRepository.save(student);
 
         if (newStudent != null) {
             return true;
         } else {
-            return false;
+            throw new Exception("Could not add Student.");
         }
     }
 
-    public void updateStudent(Long id, Student student) throws Exception {
-        Student studentFound = studentRepository.findById(id).get();
-        if (studentFound == null)
+    public boolean updateStudent(Long id, Student student) throws Exception {
+        Optional<Student>studentFound = studentRepository.findById(id);
+        if (!studentFound.isPresent())
             throw new Exception("Student not found");
+
+        Student updatedStudent = studentFound.get();
 
         if (student.getFirstName() != null && !student.getFirstName().isEmpty())
-            studentFound.setFirstName(student.getFirstName());
+            updatedStudent.setFirstName(student.getFirstName());
 
         if (student.getLastName() != null && !student.getLastName().isEmpty())
-            studentFound.setLastName(student.getLastName());
+            updatedStudent.setLastName(student.getLastName());
 
-        studentRepository.save(studentFound);
+        studentRepository.save(updatedStudent);
+        return true;
     }
 
-    public void deleteStudent(Long id) throws Exception {
-        Student studentFound = studentRepository.findById(id).get();
-        if (studentFound == null)
+    public boolean deleteStudent(Long id) throws Exception {
+        Optional<Student> studentFound = studentRepository.findById(id);
+        if (!studentFound.isPresent())
             throw new Exception("Student not found");
 
-        studentRepository.delete(studentFound);
+        studentRepository.delete(studentFound.get());
+        return true;
     }
 }
