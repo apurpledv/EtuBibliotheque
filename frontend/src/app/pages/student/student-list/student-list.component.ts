@@ -1,7 +1,6 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { StudentService } from '../../../core/service/student-service.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, Observable } from 'rxjs';
 import { Student } from '../../../core/models/Student';
 import { Router, RouterLink } from "@angular/router";
 

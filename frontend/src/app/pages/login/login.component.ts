@@ -7,12 +7,11 @@ import { Login } from '../../core/models/Login';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../shared/material.module';
 import { AuthToken } from '../../core/models/AuthToken';
-import { Router } from '@angular/router';
-//import { AuthInterceptorService } from '../../core/service/auth-interceptor.service';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MaterialModule, RouterLink],
   templateUrl: './login.component.html',
   standalone: true,
   styleUrl: './login.component.css'
@@ -23,7 +22,6 @@ export class LoginComponent implements OnInit {
   private userService = inject(UserService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
-  //private authService = inject(AuthInterceptorService)
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
 
