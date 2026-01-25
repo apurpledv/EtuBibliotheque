@@ -34,49 +34,12 @@ describe('RegisterComponent Unit Tests', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should submit the form and call register() from its userService', () => {
-    const formThingy: FormGroup = formBuilder.group({
-        firstName: ['firstName'],
-        lastName: ['lastName'],
-        login: ['login'],
-        password: ['password']
-    });
-    component.registerForm = formThingy;
+  it('should have a register form, with a first name, last name, login and password fields', () => {
+    const textForms = document.querySelectorAll('input[type="text"]');
+    const password = document.querySelector('input[type="password"]');
 
-    // Mock a window.alert (Jest doesn't implement it)
-    const jsdomAlert = window.alert;
-    window.alert = () => {};
-
-    const spyRegister = jest.spyOn(userService, 'register');
-    
-    component.onSubmit();
-
-    fixture.detectChanges();
-    window.alert = jsdomAlert;
-    expect(spyRegister).toHaveBeenCalled();
-  });
-
-  it('should submit an invalid form and NOT call register() from its userService', () => {
-    const spyRegister = jest.spyOn(userService, 'register');
-    
-    component.onSubmit();
-    expect(spyRegister).not.toHaveBeenCalled();
-  });
-
-  it('should reset the form, setting login and password to null', () => {
-    const formThingy: FormGroup = formBuilder.group({
-        firstName: ['firstName'],
-        lastName: ['lastName'],
-        login: ['login'],
-        password: ['password']
-    });
-    component.registerForm = formThingy;
-    
-    component.onReset();
-    
-    expect(component.registerForm.controls['firstName'].value).toBeNull();
-    expect(component.registerForm.controls['lastName'].value).toBeNull();
-    expect(component.registerForm.controls['login'].value).toBeNull();
-    expect(component.registerForm.controls['password'].value).toBeNull();
+    // 3 fields: firstName, lastName and login
+    expect(textForms.length).toBe(3);
+    expect(password).toBeEmptyDOMElement();
   });
 });

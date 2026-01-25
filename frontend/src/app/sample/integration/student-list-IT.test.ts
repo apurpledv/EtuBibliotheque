@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { StudentListComponent } from '../../pages/student/student-list/student-list.component';
 import { MockStudentService } from '../mock/MockStudentService';
 import { StudentService } from '../../core/service/student-service.service';
@@ -7,12 +6,11 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { Student } from '../../core/models/Student';
 
-describe('Student-List Unit Tests', () => {
+describe('Student-List IT Tests', () => {
   let component: StudentListComponent;
   let fixture: ComponentFixture<StudentListComponent>;
 
   let studentService: MockStudentService;
-  let formBuilder: FormBuilder;
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -29,12 +27,22 @@ describe('Student-List Unit Tests', () => {
     studentService = TestBed.inject(StudentService) as MockStudentService;
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should check that the studentList is initialized', () => {
+    const response: Student[] = [];
+    jest.spyOn(studentService, 'getStudents').mockReturnValue(of(response));
+
+    component.ngOnInit();
+
+    fixture.detectChanges();
+    expect(component.students).toEqual(response);
   });
 
-  it('should create an HTML table', () => {
-    const table = document.querySelector('table');
-    expect(table).toBeInTheDocument();
+  it('should call deleteStudent() from its studentService', () => {
+    const studentId = 0;
+
+    const spyDelete = jest.spyOn(studentService, 'deleteStudent');
+    
+    component.onDeleteStudent(studentId);
+    expect(spyDelete).toHaveBeenCalled();
   });
 });

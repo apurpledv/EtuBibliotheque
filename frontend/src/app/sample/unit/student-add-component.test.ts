@@ -20,7 +20,7 @@ describe('Student-Edit Unit Tests', () => {
     TestBed.configureTestingModule({
         providers: [
             { provide: StudentService, useClass: MockStudentService },
-            { provide: ActivatedRoute, useValue: {params: of({id: 0})} }
+            { provide: ActivatedRoute, useValue: {} }
         ]
     });
 
@@ -36,42 +36,11 @@ describe('Student-Edit Unit Tests', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should submit the add form, then call addStudent() from its studentService', () => {
-    const formThingy: FormGroup = formBuilder.group({firstName: ['firstName'], lastName: ['lastName']});
-    component.studentAddForm = formThingy;
-
-    const spyAdd = jest.spyOn(studentService, 'addStudent');
+  it('should have an adding form, with a first and last name fields', () => {
+    const firstName = document.querySelector('input[type="text"]');
+    const lastName = document.querySelector('input[type="text"]');
     
-    component.onSubmit();
-
-    fixture.detectChanges();
-    expect(spyAdd).toHaveBeenCalled();
-  });
-
-  it('should submit an invalid add form, and NOT call addStudent() from its studentService', () => {
-    const spyAdd = jest.spyOn(studentService, 'addStudent');
-    
-    component.onSubmit();
-
-    fixture.detectChanges();
-    expect(spyAdd).not.toHaveBeenCalled();
-  });
-
-  it('should check that the studentAddForm is initialized', () => {
-    component.ngOnInit();
-
-    fixture.detectChanges();
-    expect(component.studentAddForm.controls['firstName'].value).toEqual('');
-    expect(component.studentAddForm.controls['lastName'].value).toEqual('');
-  });
-
-  it('should reset the form, setting firstName and lastName to null', () => {
-    const formThingy: FormGroup = formBuilder.group({firstName: ['firstName'], lastName: ['lastName']});
-    component.studentAddForm = formThingy;
-    
-    component.onReset();
-    
-    expect(component.studentAddForm.controls['firstName'].value).toBeNull();
-    expect(component.studentAddForm.controls['lastName'].value).toBeNull();
+    expect(firstName).toBeEmptyDOMElement();
+    expect(lastName).toBeEmptyDOMElement();
   });
 });

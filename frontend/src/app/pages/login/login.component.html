@@ -5,6 +5,7 @@
       <div class="form-group">
         <label>Login</label>
         <input
+          id="login"
           type="text"
           formControlName="login"
           class="form-control"
@@ -22,7 +23,8 @@
       <div class="form-group">
         <label>Password</label>
         <input
-          type="text"
+          id="password"
+          type="password"
           formControlName="password"
           class="form-control"
           [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
@@ -36,7 +38,7 @@
         }
       </div>
       <div class="text-center">
-        <button class="btn btn-primary mr-1">Login</button>
+        <button id="submit" class="btn btn-primary mr-1">Login</button>
         <button class="btn btn-secondary" type="reset" (click)="onReset()">
           Cancel
         </button>
