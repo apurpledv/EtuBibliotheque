@@ -53,7 +53,6 @@ export class LoginComponent implements OnInit {
     this.userService.login(loginUser)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
-        alert("You are logged on!");
         sessionStorage.setItem('auth_token', res.token);
         console.log("Token stored as 'auth_token': " + sessionStorage.getItem("auth_token"));
         this.router.navigateByUrl('student-list');
