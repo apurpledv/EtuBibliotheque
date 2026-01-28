@@ -6,6 +6,7 @@
         <div class="form-group col-5">
           <label>First Name</label>
           <input
+            name="firstName"
             type="text"
             formControlName="firstName"
             class="form-control"
@@ -22,6 +23,7 @@
         <div class="form-group col-5">
           <label>Last Name</label>
           <input
+            name="lastName"
             type="text"
             formControlName="lastName"
             class="form-control"
@@ -39,6 +41,7 @@
       <div class="form-group">
         <label>Login</label>
         <input
+          name="login"
           type="text"
           formControlName="login"
           class="form-control"
@@ -56,7 +59,8 @@
       <div class="form-group">
         <label>Password</label>
         <input
-          type="text"
+          name="password"
+          type="password"
           formControlName="password"
           class="form-control"
           [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
@@ -69,11 +73,12 @@
           </div>
         }
       </div>
-      <div class="text-center">
+      <div class="text-center card-body">
         <button class="btn btn-primary mr-1">Register</button>
         <button class="btn btn-secondary" type="reset" (click)="onReset()">
           Cancel
         </button>
+        <p class="card-text">Already have an account? <a routerLink="../login">Sign in here!</a></p>
       </div>
     </form>
   </div>

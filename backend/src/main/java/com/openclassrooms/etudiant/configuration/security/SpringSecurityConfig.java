@@ -1,11 +1,16 @@
 package com.openclassrooms.etudiant.configuration.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,7 +18,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration
 @EnableWebSecurity
@@ -22,10 +36,11 @@ public class SpringSecurityConfig {
     @Autowired
     private CustomUserDetailService customUserDetailService;
 
+    private final String sKey = "qhb9ikUFGKPyUUMKBrrV7ByQjBWFy8xLPkKr36XSiTH";
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(customUserDetailService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -39,26 +54,43 @@ public class SpringSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
+    @Bean
+    public JwtEncoder jwtEncoder() throws JOSEException {
+        final SecretKey jwtKey = new SecretKeySpec(sKey.getBytes(), "HmacSHA256");
+        JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(jwtKey);
+        return new NimbusJwtEncoder(immutableSecret);
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        final SecretKey jwtKey = new SecretKeySpec(sKey.getBytes(), "HmacSHA256");
+        return NimbusJwtDecoder.withSecretKey(jwtKey).build();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .authorizeHttpRequests(authorize -> authorize
-                        // No auth needed on :
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/register", "/api/login").permitAll()
-                        // Others protected routes will be added here.
-                        .anyRequest().authenticated()
-                )
-                // .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
-                        (request, response, exception) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage());
-                        }));
+            .cors(AbstractHttpConfigurer::disable)
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider())
+            .authorizeHttpRequests(authorize -> authorize
+                // No auth needed on :
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/register", "/api/login").permitAll()
+                // Others protected routes will be added here.
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(Customizer.withDefaults())
+            )
+            .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
+                (request, response, exception) -> {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage());
+                })
+            );
+
         return http.build();
     }
 
